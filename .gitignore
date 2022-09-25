@@ -9,3 +9,4 @@ dist
 
 # Mac
 .DS_Store
+.vercel
