@@ -2,10 +2,12 @@ lockfileVersion: 5.4
 
 specifiers:
   '@nuxt/ui': ^0.3.3
+  '@nuxtjs/web-vitals': ^0.1.10
   nuxt: 3.0.0-rc.11
 
 dependencies:
   '@nuxt/ui': 0.3.3_nuxt@3.0.0-rc.11
+  '@nuxtjs/web-vitals': 0.1.10
 
 devDependencies:
   nuxt: 3.0.0-rc.11
@@ -592,6 +594,14 @@ packages:
       pathe: 0.3.8
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /@nuxtjs/web-vitals/0.1.10:
+    resolution: {integrity: sha512-Sf8v7BUB+Bfmao6AioPRmSpyq/MMvq0tFwFiXVe2oL9HgdDgu+6sfcSBDnvzmgcEQPfPZp1KCxc5N2vNERem0w==}
+    dependencies:
+      defu: 6.1.0
+      ufo: 0.8.5
+      web-vitals: 2.1.4
     dev: false
 
   /@polka/url/1.0.0-next.21:
@@ -4334,6 +4344,10 @@ packages:
   /web-streams-polyfill/3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
     engines: {node: '>= 8'}
+
+  /web-vitals/2.1.4:
+    resolution: {integrity: sha512-sVWcwhU5mX6crfI5Vd2dC4qchyTqxV8URinzt25XqVh+bHEPGH4C3NPrNionCP7Obx59wrYEbNlw4Z8sjALzZg==}
+    dev: false
 
   /webidl-conversions/3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
