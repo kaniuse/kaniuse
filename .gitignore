@@ -10,3 +10,5 @@ dist
 # Mac
 .DS_Store
 .vercel
+
+server/data/gvk_api_lifecycle.json
