@@ -74,9 +74,6 @@ func (r *RepoSwaggerFetcher) ListAPI(ctx context.Context) (map[GroupVersionKind]
 			if !ok {
 				continue
 			}
-			// FIXME: use a logger
-			fmt.Printf("%s %s %s\n", r.version.String(),
-				gvk.GroupVersionString(), gvk.KindString())
 			result[*gvk] = fetchAPILifeCycleFromSchema(item.Schema)
 		}
 	}
