@@ -12,7 +12,7 @@ import (
 func main() {
 	var versions []string
 
-	for version := semver.MustParse("1.11"); version.Minor() <= 25; {
+	for version := semver.MustParse("1.5"); version.Minor() <= 25; {
 		versions = append(versions, fmt.Sprintf("%d.%d.%d", version.Major(), version.Minor(), version.Patch()))
 		tmp := version.IncMinor()
 		version = &tmp
