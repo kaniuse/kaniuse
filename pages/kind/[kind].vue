@@ -10,25 +10,28 @@
     <div class="flex-1 p-4">
       <div class="grid h-10" style="grid-template-columns: repeat(18, minmax(0, 1fr))">
         <div style="grid-column: span 6"></div>
-        <div class="flex" style="grid-column: span 8">
+        <div class="flex border-x border-r border-neutral" style="grid-column: span 8">
           <div class="bg-green-500 w-full h-4 my-auto" style=""></div>
         </div>
       </div>
       <div class="grid h-10" style="grid-template-columns: repeat(18, minmax(0, 1fr))">
         <div style="grid-column: span 11"></div>
-        <div class="flex" style="grid-column: span 7">
+        <div class="flex border-x border-neutral" style="grid-column: span 7">
           <div class="bg-green-500 w-full h-4 my-auto" style=""></div>
         </div>
       </div>
       <div class="grid h-10" style="grid-template-columns: repeat(18, minmax(0, 1fr))">
-        <div class="flex" style="grid-column: span 6">
+        <div class="flex border-l border-neutral" style="grid-column: span 6">
           <div class="bg-green-500 w-full h-4 my-auto" style=""></div>
         </div>
-        <div class="flex" style="grid-column: span 8">
+        <div class="flex border-x border-neutral" style="grid-column: span 8">
           <div class="bg-orange-500 w-full h-4 my-auto" style=""></div>
         </div>
       </div>
-      <div class="h-10 grid text-center" style="grid-template-columns: repeat(18, minmax(0, 1fr))">
+      <div
+        class="h-10 grid text-center divide-x divide-neutral"
+        style="grid-template-columns: repeat(18, minmax(0, 1fr))"
+      >
         <div class="p-2"><a>1.8</a></div>
         <div class="p-2"><a>1.9</a></div>
         <div class="p-2"><a>1.10</a></div>
