@@ -5,7 +5,7 @@ ENV GO111MODULE on
 ENV CGO_ENABLED 0
 WORKDIR /
 COPY . /data-scraper
-RUN cd /data-scraper && go build -o /data-scraper/data-scraper .
+RUN cd /data-scraper && go build -o /data-scraper/data-scraper ./cmd/data-scraper
 
 FROM debian:stable-slim AS certs
 RUN apt-get update && apt-get -uy upgrade

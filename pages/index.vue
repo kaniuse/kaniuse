@@ -1,16 +1,17 @@
 <template>
-  <div class="flex justify-center">
-    <div class="container flex justify-left items-center m-4">
-      <div>
+  <div class="flex justify-left items-center m-4">
+    <div>
+      <div class="p-4">
         <a class="text-lg">Can I use</a>
-        <input v-model="filter" placeholder="Type here" class="input input-bordered" />
+        <input v-model="filter" placeholder="Kind, eg. Ingress" class="input input-bordered mx-5" />
         <a class="text-lg">?</a>
-
+      </div>
+      <div class="p-4">
         <ul>
-          <li v-for="item in filteredGvks">
-            <a :href="`/api-lifecycle/${item.group}/${item.version}/${item.kind}`" target="_blank"
-              >{{ item.group }}/{{ item.version }} - {{ item.kind }}</a
-            >
+          <li v-for="(kind, index) in filteredKinds" :key="index">
+            <a :href="`/kind/${kind}`" target="_blank">
+              {{ kind }}
+            </a>
           </li>
         </ul>
       </div>
@@ -29,38 +30,23 @@ export default defineComponent({
   data() {
     return {
       filter: '',
-      gvks: [] as {
-        group: string
-        version: string
-        kind: string
-      }[],
+      kinds: [] as string[],
     }
   },
   mounted() {
-    const fetchData = async () => {
-      const response = await fetch('/api/gvks')
+    const fetchKinds = async () => {
+      const response = await fetch('/api/kinds')
       const data = (await response.json()) as string[]
-      data.map((item) => {
-        const [group, versionkind] = item.split('/')
-        const [version, kind] = versionkind.split('-')
-        this.gvks.push({
-          group: group.trim(),
-          version: version.trim(),
-          kind: kind.trim(),
-        })
-      })
+      this.kinds = data
     }
-    fetchData()
+    fetchKinds()
   },
   computed: {
-    filteredGvks() {
-      return this.gvks.filter((item) => {
-        return (
-          item.group.toLowerCase().includes(this.filter.toLowerCase()) ||
-          item.version.toLowerCase().includes(this.filter.toLowerCase()) ||
-          item.kind.toLowerCase().includes(this.filter.toLowerCase())
-        )
-      })
+    filteredKinds() {
+      if (!this.filter) {
+        return this.kinds
+      }
+      return this.kinds.filter((kind) => kind.toLowerCase().includes(this.filter.toLowerCase()))
     },
   },
 })

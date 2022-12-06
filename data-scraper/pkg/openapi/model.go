@@ -1,8 +1,9 @@
-package main
+package openapi
 
 import (
 	"fmt"
 	"github.com/Masterminds/semver"
+	"github.com/kaniuse/kaniuse/data-scraper/pkg/syncmap"
 	"sort"
 )
 
@@ -10,11 +11,11 @@ import (
 // only support string as the key.
 type GroupVersionKindAPIAvailabilityJSONContainer map[GroupVersionStr]map[KindStr][]KubernetesMinorReleaseAndAPILifeCycleTuple
 
-type groupVersionKindAvailability TypedSyncMap[GroupVersionKind, *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple]
+type GroupVersionKindAvailability syncmap.TypedSyncMap[GroupVersionKind, *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple]
 
-func AsJSONContainer(g groupVersionKindAvailability) GroupVersionKindAPIAvailabilityJSONContainer {
+func AsJSONContainer(g GroupVersionKindAvailability) GroupVersionKindAPIAvailabilityJSONContainer {
 	result := make(map[GroupVersionStr]map[KindStr][]KubernetesMinorReleaseAndAPILifeCycleTuple)
-	typedMap := TypedSyncMap[GroupVersionKind, *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple](g)
+	typedMap := syncmap.TypedSyncMap[GroupVersionKind, *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple](g)
 	typedMap.Range(func(key GroupVersionKind, value *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple) bool {
 		groupVersionStr := key.GroupVersionString()
 		kindStr := key.KindString()
@@ -79,8 +80,7 @@ func (o *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple) Append(tuple Kuberne
 
 func (o *OrderedKubernetesMinorReleaseAndAPILifeCycleTuple) AsArray() []KubernetesMinorReleaseAndAPILifeCycleTuple {
 	sort.Slice(o.base, func(i, j int) bool {
-		semver.MustParse(o.base[i].KubernetesMinorRelease).LessThan(semver.MustParse(o.base[j].KubernetesMinorRelease))
-		return o.base[i].KubernetesMinorRelease < o.base[j].KubernetesMinorRelease
+		return semver.MustParse(o.base[i].KubernetesMinorRelease).LessThan(semver.MustParse(o.base[j].KubernetesMinorRelease))
 	})
 	return o.base
 }

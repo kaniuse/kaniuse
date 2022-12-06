@@ -11,4 +11,4 @@ dist
 .DS_Store
 .vercel
 
-server/data/gvk_api_lifecycle.json
+server/data/*.json

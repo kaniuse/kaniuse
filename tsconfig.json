@@ -1,6 +1,7 @@
 {
   "compilerOptions":{
-    "strict": true
+    "strict": true,
+    "baseUrl": ".",
   },
   // https://v3.nuxtjs.org/concepts/typescript
   "extends": "./.nuxt/tsconfig.json"

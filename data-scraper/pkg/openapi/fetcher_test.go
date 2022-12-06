@@ -1,4 +1,4 @@
-package main
+package openapi
 
 import (
 	"github.com/Masterminds/semver"
