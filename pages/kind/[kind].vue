@@ -20,8 +20,12 @@
         }"
       >
         <div
-          v-for="item in span.spans"
-          class="flex border-l border-neutral"
+          v-for="(item, index) in span.spans"
+          class="flex border-neutral"
+          :class="{
+            'border-l': index !== span.spans.length - 1,
+            'border-x': index === span.spans.length - 1,
+          }"
           :style="{
             gridColumn: versions.indexOf(item.start) + 1 + ' / ' + (versions.indexOf(item.end) + 2),
           }"
