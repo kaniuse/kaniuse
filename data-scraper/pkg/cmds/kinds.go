@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"os"
+	"sort"
 )
 
 type kindsCmdOptions struct {
@@ -64,6 +65,34 @@ func kindsRun(options kindsCmdOptions) error {
 			result[key.Kind] = append(result[key.Kind], entry)
 			return true
 		})
+
+	// sort result with the supported version
+	for _, lifecycles := range result {
+		sort.Slice(lifecycles, func(i, j int) bool {
+			itemI := lifecycles[i]
+			itemJ := lifecycles[j]
+			// order with group, version conventions
+			if itemI.GVK.Group != itemJ.GVK.Group {
+				ci := containsInLegacyGroups(itemI.GVK.Group)
+				cj := containsInLegacyGroups(itemJ.GVK.Group)
+				if ci && !cj {
+					return true
+				}
+				if !ci && cj {
+					return false
+				}
+			}
+			apiVersionI, err := ParseAPIVersion(itemI.GVK.Version)
+			if err != nil {
+				panic(err)
+			}
+			apiVersionJ, err := ParseAPIVersion(itemJ.GVK.Version)
+			if err != nil {
+				panic(err)
+			}
+			return apiVersionI.LessThan(*apiVersionJ)
+		})
+	}
 	bytes, err := json.Marshal(result)
 	if err != nil {
 		return err
@@ -77,4 +106,35 @@ func kindsRun(options kindsCmdOptions) error {
 		fmt.Println(string(bytes))
 	}
 	return nil
+}
+
+func filterStables(origin []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple) []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple {
+	result := make([]openapi.KubernetesMinorReleaseAndAPILifeCycleTuple, 0)
+	for _, lifecycle := range origin {
+		if lifecycle.APILifecycle == openapi.APILifecycleStable {
+			result = append(result, lifecycle)
+		}
+	}
+	return result
+}
+
+func filterDeprecated(origin []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple) []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple {
+	result := make([]openapi.KubernetesMinorReleaseAndAPILifeCycleTuple, 0)
+	for _, lifecycle := range origin {
+		if lifecycle.APILifecycle == openapi.APILifecycleDeprecated {
+			result = append(result, lifecycle)
+		}
+	}
+	return result
+}
+
+var legacyGroups = []string{"extensions", "core"}
+
+func containsInLegacyGroups(group string) bool {
+	for _, legacyGroup := range legacyGroups {
+		if group == legacyGroup {
+			return true
+		}
+	}
+	return false
 }
