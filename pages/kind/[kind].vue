@@ -119,7 +119,6 @@ export default defineNuxtComponent({
           if (index == 0) {
             start = item.kubernetesMinorRelease
             lifecycle = item.APILifecycle
-            continue
           }
           if (lifecycle !== item.APILifecycle) {
             spans.push({ start: start, end: gvk.Lifecycles[index - 1].kubernetesMinorRelease, lifecycle: lifecycle })
