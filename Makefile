@@ -21,6 +21,11 @@ data-kinds:
 	cd data-scraper && \
 		go run ./cmd/data-scraper kinds -w ../server/data/kinds.json
 
+.PHONY: data-fields
+data-fields:
+	cd data-scraper && \
+		go run ./cmd/data-scraper fields -w ../server/data/fields.json
+
 # The help will print out all targets with their descriptions organized bellow their categories. The categories are represented by `##@` and the target descriptions by `##`.
 # The awk commands is responsible to read the entire set of makefiles included in this invocation, looking for lines of the file as xyz: ## something, and then pretty-format the target and help. Then, if there's a line with ##@ something, that gets pretty-printed as a category.
 # More info over the usage of ANSI control characters for terminal formatting: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters

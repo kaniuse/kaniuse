@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/Masterminds/semver"
@@ -16,7 +17,8 @@ import (
 // CertainVersionAPILifecycleFetcher fetch all available API resources for a certain Kubernetes minor version.
 type CertainVersionAPILifecycleFetcher interface {
 	KubernetesMinorVersion() (string, error)
-	ListAPI(ctx context.Context) (map[GroupVersionKind]APILifecycle, error)
+	ListAPI(ctx context.Context) (map[GroupVersionKind]APILifeCycle, error)
+	ListFields(ctx context.Context) (map[GroupVersionKind][]FlattenFieldAndLifeCycle, error)
 }
 
 var _ error = (*ErrVersionStartWithV)(nil)
@@ -54,7 +56,7 @@ func (r *RepoSwaggerFetcher) KubernetesMinorVersion() (string, error) {
 	return fmt.Sprintf("%d.%d", r.version.Major(), r.version.Minor()), nil
 }
 
-func (r *RepoSwaggerFetcher) ListAPI(ctx context.Context) (map[GroupVersionKind]APILifecycle, error) {
+func (r *RepoSwaggerFetcher) ListAPI(ctx context.Context) (map[GroupVersionKind]APILifeCycle, error) {
 	downloader := swaggerJsonDownloader{gitTag: fmt.Sprintf("v%s", r.version.String())}
 	content, err := downloader.FetchSwaggerJSONContent(ctx)
 	if err != nil {
@@ -66,7 +68,7 @@ func (r *RepoSwaggerFetcher) ListAPI(ctx context.Context) (map[GroupVersionKind]
 		return nil, err
 	}
 
-	var result = make(map[GroupVersionKind]APILifecycle)
+	var result = make(map[GroupVersionKind]APILifeCycle)
 
 	for _, item := range document.Analyzer.AllDefinitions() {
 		if strings.HasPrefix(item.Name, "io.k8s.api.") {
@@ -78,6 +80,64 @@ func (r *RepoSwaggerFetcher) ListAPI(ctx context.Context) (map[GroupVersionKind]
 		}
 	}
 
+	return result, nil
+}
+
+type FlattenFieldAndLifeCycle struct {
+	// the field path, e.g. "io.k8s.api.core.v1.Namespace.spec"
+	FieldPath string
+	// the field type, e.g. "string", "integer", "array", "object"
+	FieldType string
+	// the field description
+	FieldDescription string
+	Lifecycle        APILifeCycle
+}
+
+func (r *RepoSwaggerFetcher) ListFields(ctx context.Context) (map[GroupVersionKind][]FlattenFieldAndLifeCycle, error) {
+	downloader := swaggerJsonDownloader{gitTag: fmt.Sprintf("v%s", r.version.String())}
+	content, err := downloader.FetchSwaggerJSONContent(ctx)
+	if err != nil {
+		return nil, err
+	}
+	document, err := loads.Analyzed(content, "")
+	if err != nil {
+		return nil, err
+	}
+	references := document.Analyzer.AllDefinitions()
+	result := make(map[GroupVersionKind][]FlattenFieldAndLifeCycle)
+	for _, schemaRef := range references {
+		if strings.HasPrefix(schemaRef.Name, "io.k8s.api.") {
+			gvk, ok := parseGVKFromDefinitionExtension(schemaRef.Schema.VendorExtensible.Extensions)
+			if !ok {
+				continue
+			}
+			definitions := document.Spec().Definitions
+			var fields []FlattenFieldAndLifeCycle
+			err = walkthroughSchema(schemaRef.Name, schemaRef.Schema, definitions,
+				func(fieldPath string, schema *spec.Schema) error {
+					var fieldType = ""
+					if len(schema.Type) == 0 {
+						fmt.Fprintf(os.Stderr, "field %s has no type, kubernetes version %s\n", fieldPath, r.version.String())
+					} else {
+						fieldType = schema.Type[0]
+						if len(schema.Type) > 1 {
+							fmt.Fprintf(os.Stderr, "field %s has multiple type, kubernetes version %s\n", fieldPath, r.version.String())
+						}
+					}
+					fields = append(fields, FlattenFieldAndLifeCycle{
+						FieldPath:        fieldPath,
+						FieldType:        fieldType,
+						FieldDescription: schema.Description,
+						Lifecycle:        fetchAPILifeCycleFromSchema(schema),
+					})
+					return nil
+				})
+			if err != nil {
+				return nil, err
+			}
+			result[*gvk] = fields
+		}
+	}
 	return result, nil
 }
 
@@ -107,7 +167,7 @@ func parseGVKFromDefinitionExtension(extension map[string]interface{}) (*GroupVe
 	return nil, false
 }
 
-func fetchAPILifeCycleFromSchema(schema *spec.Schema) APILifecycle {
+func fetchAPILifeCycleFromSchema(schema *spec.Schema) APILifeCycle {
 	if schema == nil {
 		return APILifecycleUnknown
 	}
@@ -137,4 +197,44 @@ func (s swaggerJsonDownloader) FetchSwaggerJSONContent(ctx context.Context) ([]b
 		_ = response.Body.Close()
 	}()
 	return io.ReadAll(response.Body)
+}
+
+type ResolveSchemaFunc func(fieldPath string, schema *spec.Schema) error
+
+func walkthroughSchema(fieldPath string, schema *spec.Schema, definitions map[string]spec.Schema,
+	action ResolveSchemaFunc,
+) error {
+	resolvedSchema, err := resolveSchemaOrRef(schema, definitions)
+	if err != nil {
+		return err
+	}
+	err = action(fieldPath, resolvedSchema)
+	if err != nil {
+		return err
+	}
+	for propertyName, schema := range resolvedSchema.Properties {
+		err := walkthroughSchema(fieldPath+"."+propertyName, &schema, definitions, action)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func resolveSchemaOrRef(schema *spec.Schema, definitions map[string]spec.Schema) (*spec.Schema, error) {
+	if schema == nil {
+		return nil, fmt.Errorf("could not resolve nil schema")
+	}
+	if schema.Ref.String() == "" {
+		// not a ref, use it directly
+		return schema, nil
+	}
+	if strings.HasPrefix(schema.Ref.String(), "#/definitions/") {
+		// ref to a definition, resolve it
+		definitionName := strings.TrimPrefix(schema.Ref.String(), "#/definitions/")
+		definition := definitions[definitionName]
+		return &definition, nil
+	}
+	// ref but not to a local definition, panic now
+	return nil, fmt.Errorf("not a ref to #/definition: %s", schema.Ref.String())
 }

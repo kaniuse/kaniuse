@@ -51,7 +51,7 @@ func kindsRun(options kindsCmdOptions) error {
 	type GVKAndMinorVersionAndAPILifecycles struct {
 		DisplayGVK string
 		GVK        openapi.GroupVersionKind
-		Lifecycles []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple
+		Lifecycles []openapi.VersionAPILifeCycle
 	}
 	result := make(map[string][]GVKAndMinorVersionAndAPILifecycles)
 	apis.Range(
@@ -82,11 +82,11 @@ func kindsRun(options kindsCmdOptions) error {
 					return false
 				}
 			}
-			apiVersionI, err := ParseAPIVersion(itemI.GVK.Version)
+			apiVersionI, err := openapi.ParseAPIVersion(itemI.GVK.Version)
 			if err != nil {
 				panic(err)
 			}
-			apiVersionJ, err := ParseAPIVersion(itemJ.GVK.Version)
+			apiVersionJ, err := openapi.ParseAPIVersion(itemJ.GVK.Version)
 			if err != nil {
 				panic(err)
 			}
@@ -108,26 +108,6 @@ func kindsRun(options kindsCmdOptions) error {
 	return nil
 }
 
-func filterStables(origin []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple) []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple {
-	result := make([]openapi.KubernetesMinorReleaseAndAPILifeCycleTuple, 0)
-	for _, lifecycle := range origin {
-		if lifecycle.APILifecycle == openapi.APILifecycleStable {
-			result = append(result, lifecycle)
-		}
-	}
-	return result
-}
-
-func filterDeprecated(origin []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple) []openapi.KubernetesMinorReleaseAndAPILifeCycleTuple {
-	result := make([]openapi.KubernetesMinorReleaseAndAPILifeCycleTuple, 0)
-	for _, lifecycle := range origin {
-		if lifecycle.APILifecycle == openapi.APILifecycleDeprecated {
-			result = append(result, lifecycle)
-		}
-	}
-	return result
-}
-
 var legacyGroups = []string{"extensions", "core"}
 
 func containsInLegacyGroups(group string) bool {
@@ -137,4 +117,10 @@ func containsInLegacyGroups(group string) bool {
 		}
 	}
 	return false
+}
+
+func semVerLessThan(a, b string) bool {
+	apiVersionA := semver.MustParse(a)
+	apiVersionB := semver.MustParse(b)
+	return apiVersionA.LessThan(apiVersionB)
 }

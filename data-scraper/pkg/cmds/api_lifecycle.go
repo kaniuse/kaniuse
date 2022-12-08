@@ -92,13 +92,13 @@ func fetchAPIs(ctx context.Context, minVersion semver.Version, maxVersion semver
 			for gvk, lifecycle := range apis {
 				lifecycles, ok := multiVersion.Load(gvk)
 				if ok {
-					lifecycles.Append(openapi.KubernetesMinorReleaseAndAPILifeCycleTuple{
+					lifecycles.Append(openapi.VersionAPILifeCycle{
 						KubernetesMinorRelease: minorVersion,
 						APILifecycle:           lifecycle,
 					})
 				} else {
 					lifecycles = &openapi.OrderedKubernetesMinorReleaseAndAPILifeCycleTuple{}
-					lifecycles.Append(openapi.KubernetesMinorReleaseAndAPILifeCycleTuple{
+					lifecycles.Append(openapi.VersionAPILifeCycle{
 						KubernetesMinorRelease: minorVersion,
 						APILifecycle:           lifecycle,
 					})

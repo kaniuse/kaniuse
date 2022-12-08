@@ -17,5 +17,10 @@ func NewRootCommand() (*cobra.Command, error) {
 		return nil, err
 	}
 	root.AddCommand(kindsCmd)
+  fieldsCmd, err := NewFieldsCmd()
+  if err != nil {
+    return nil, err
+  }
+  root.AddCommand(fieldsCmd)
 	return &root, nil
 }

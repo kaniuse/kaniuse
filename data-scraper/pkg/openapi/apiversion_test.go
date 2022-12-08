@@ -1,4 +1,4 @@
-package cmds
+package openapi
 
 import (
 	"reflect"
