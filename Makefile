@@ -9,9 +9,16 @@ data-scraper: ## Build image ghcr.io/kaniuse/data-scraper:latest
 	cd data-scraper && go build -o ./data-scraper ./cmd/data-scraper
 
 .PHONY: data
-data: ## Update data JSON files
+data: data-api-lifecycle data-kinds ## Update data JSON files
+
+.PHONY: data-api-lifecycle
+data-api-lifecycle:
+		cd data-scraper && \
+		go run ./cmd/data-scraper api-lifecycle -w ../server/data/gvk_api_lifecycle.json
+
+.PHONY: data-kinds
+data-kinds:
 	cd data-scraper && \
-		go run ./cmd/data-scraper api-lifecycle -w ../server/data/gvk_api_lifecycle.json && \
 		go run ./cmd/data-scraper kinds -w ../server/data/kinds.json
 
 # The help will print out all targets with their descriptions organized bellow their categories. The categories are represented by `##@` and the target descriptions by `##`.
