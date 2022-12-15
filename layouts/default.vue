@@ -19,7 +19,7 @@
         >
       </div>
     </div>
-    <div class="container mx-auto">
+    <div class="container mx-auto h-full">
       <slot />
     </div>
   </div>

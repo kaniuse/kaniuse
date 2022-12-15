@@ -2,18 +2,34 @@
   <h1 class="text-3xl p-4">
     <a class="text-gray-500">Fields Availability for </a><a>{{ $route.params.gvk }}</a>
   </h1>
-  <div class="overflow-x-auto overflow-y-auto h-screen">
+  <div class="overflow-x-auto overflow-y-auto border-neutral" style="height: 85vh">
     <table class="table table-compact w-full">
       <thead>
-        <tr style="position: sticky">
+        <tr>
           <th class="border px-4 py-2">Field</th>
-          <th v-for="version in versions" class="border px-4 py-2">{{ version }}</th>
+          <th v-for="version in versions.reverse()" class="border px-4 py-2">{{ version }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="field in fields" :key="field">
-          <td class="border px-4 py-2">{{ field }}</td>
-          <td v-for="version in versions" class="border px-4 py-2">{{ aggregatedFields.get(field)!.get(version) }}</td>
+        <tr v-for="field in fields">
+          <td class="border px-4 py-2">
+            {{
+              field
+                .replace('io.k8s.api.', '')
+                .replace(($route.params.gvk as string).split(' ')[0].replace('/', '.') + '.', '')
+            }}
+          </td>
+          <td
+            v-for="version in versions.reverse()"
+            class="border px-4 py-2"
+            :class="{
+            'bg-green-500': aggregatedFields.get(field)!.get(version) === 'stable',
+            'bg-yellow-500': aggregatedFields.get(field)!.get(version) === 'deprecated',
+            'bg-neutral': aggregatedFields.get(field)!.get(version) === undefined,
+          }"
+          >
+            {{ aggregatedFields.get(field)!.get(version) }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -91,7 +107,7 @@ export default defineComponent({
       return result
     },
     fields(): string[] {
-      return Array.from(this.aggregatedFields.keys())
+      return Array.from(this.aggregatedFields.keys()).sort()
     },
   },
 })
