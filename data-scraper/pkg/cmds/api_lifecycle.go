@@ -4,17 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"sync"
+
 	"github.com/Masterminds/semver"
 	"github.com/kaniuse/kaniuse/data-scraper/pkg/openapi"
 	"github.com/kaniuse/kaniuse/data-scraper/pkg/syncmap"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"os"
-	"sync"
 )
 
 const ScrapMinVersion = "1.5"
-const ScrapMaxVersion = "1.25"
+const ScrapMaxVersion = "1.26"
 
 type apiLifecycleCmdOptions struct {
 	Write      string
