@@ -9,7 +9,7 @@ data-scraper: ## Build image ghcr.io/kaniuse/data-scraper:latest
 	cd data-scraper && go build -o ./data-scraper ./cmd/data-scraper
 
 .PHONY: data
-data: data-api-lifecycle data-kinds ## Update data JSON files
+data: data-api-lifecycle data-kinds data-fields ## Update data JSON files
 
 .PHONY: data-api-lifecycle
 data-api-lifecycle:

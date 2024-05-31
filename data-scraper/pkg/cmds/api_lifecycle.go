@@ -15,7 +15,7 @@ import (
 )
 
 const ScrapMinVersion = "1.5"
-const ScrapMaxVersion = "1.26"
+const ScrapMaxVersion = "1.30"
 
 type apiLifecycleCmdOptions struct {
 	Write      string
