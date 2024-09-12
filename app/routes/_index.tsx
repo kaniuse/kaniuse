@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from '@remix-run/react'
+import { useEffect } from 'react'
 
 export default function Index() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
-    navigate('/kinds');
-  }, [navigate]);
+    navigate('/kinds')
+  }, [navigate])
 
-  return null;
+  return null
 }

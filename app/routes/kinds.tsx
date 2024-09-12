@@ -1,17 +1,15 @@
-import { useState } from 'react';
-import { Link } from '@remix-run/react';
-import useSWR from 'swr';
+import { Link } from '@remix-run/react'
+import { useState } from 'react'
+import useSWR from 'swr'
 
-const fetcher = () => fetch('/api/kinds').then(res => res.json());
+const fetcher = () => fetch('/api/kinds').then((res) => res.json())
 
 export default function Index() {
-  const { data: kinds, error } = useSWR<string[]>('kinds', fetcher);
+  const { data: kinds, error } = useSWR<string[]>('kinds', fetcher)
 
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState('')
 
-  const filteredKinds = kinds?.filter((kind) =>
-    kind.toLowerCase().includes(filter.toLowerCase())
-  ) || [];
+  const filteredKinds = kinds?.filter((kind) => kind.toLowerCase().includes(filter.toLowerCase())) || []
 
   return (
     <div className="flex justify-left items-center m-4">
@@ -39,5 +37,5 @@ export default function Index() {
         </div>
       </div>
     </div>
-  );
+  )
 }

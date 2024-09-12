@@ -1,28 +1,19 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
-import { Link, useLocation } from "@remix-run/react";
+import type { LinksFunction, MetaFunction } from '@remix-run/node'
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
+import { Link, useLocation } from '@remix-run/react'
 
-import stylesheet from "./styles/tailwind.css";
+import styles from './tailwind.css?url'
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
-];
+export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 export const meta: MetaFunction = () => [
-  { charset: "utf-8" },
-  { title: "Kaniuse" },
-  { name: "viewport", content: "width=device-width,initial-scale=1" },
-];
+  { charset: 'utf-8' },
+  { title: 'Kaniuse' },
+  { name: 'viewport', content: 'width=device-width,initial-scale=1' },
+]
 
 export default function App() {
-  const location = useLocation();
+  const location = useLocation()
 
   return (
     <html lang="en">
@@ -67,5 +58,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  );
+  )
 }

@@ -1,22 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Link } from '@remix-run/react';
+import { Link } from '@remix-run/react'
+import { useEffect, useState } from 'react'
 
 export default function Fields() {
-  const [filter, setFilter] = useState('');
-  const [gvks, setGvks] = useState<string[]>([]);
+  const [filter, setFilter] = useState('')
+  const [gvks, setGvks] = useState<string[]>([])
 
   useEffect(() => {
     const fetchGvks = async () => {
-      const response = await fetch('/api/gvks');
-      const data = await response.json();
-      setGvks(data);
-    };
-    fetchGvks();
-  }, []);
+      const response = await fetch('/api/gvks')
+      const data = await response.json()
+      setGvks(data)
+    }
+    fetchGvks()
+  }, [])
 
-  const filteredGVKs = filter
-    ? gvks.filter((gvk) => gvk.toLowerCase().includes(filter.toLowerCase()))
-    : gvks;
+  const filteredGVKs = filter ? gvks.filter((gvk) => gvk.toLowerCase().includes(filter.toLowerCase())) : gvks
 
   return (
     <div className="flex justify-left items-center m-4">
@@ -44,5 +42,5 @@ export default function Fields() {
         </div>
       </div>
     </div>
-  );
+  )
 }
