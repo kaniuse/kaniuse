@@ -11,4 +11,6 @@ dist
 .DS_Store
 .vercel
 
-server/data/*.json
+public/data/*.json
+
+build
