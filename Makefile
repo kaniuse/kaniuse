@@ -5,7 +5,7 @@ image-data-scraper: ## Build image ghcr.io/kaniuse/data-scraper:latest
 	docker build -t ghcr.io/kaniuse/data-scraper:latest ./data-scraper
 
 .PHONY: data-scraper
-data-scraper: ## Build image ghcr.io/kaniuse/data-scraper:latest
+data-scraper: ## Build binary executable for data-scraper
 	cd data-scraper && go build -o ./data-scraper ./cmd/data-scraper
 
 .PHONY: data
