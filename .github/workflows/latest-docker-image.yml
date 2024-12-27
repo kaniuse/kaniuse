@@ -17,6 +17,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the Docker image
-        run: make image-data-scraper
+        run: |
+          VERSION=$(curl -sSL https://cdn.dl.k8s.io/release/stable.txt)
+          ScrapMaxVersion=$VERSION make image-data-scraper
       - name: Push docker image to ghcr.io
         run: docker push ghcr.io/kaniuse/data-scraper:latest

@@ -1,12 +1,13 @@
 .DEFAULT_GOAL:=help
+ScrapMaxVersion ?=1.32
 
 .PHONY: image-data-scraper
 image-data-scraper: ## Build image ghcr.io/kaniuse/data-scraper:latest
-	docker build -t ghcr.io/kaniuse/data-scraper:latest ./data-scraper
+	docker build --build-arg ScrapMaxVersion=$(ScrapMaxVersion) -t ghcr.io/kaniuse/data-scraper:latest ./data-scraper
 
 .PHONY: data-scraper
 data-scraper: ## Build binary executable for data-scraper
-	cd data-scraper && go build -o ./data-scraper ./cmd/data-scraper
+	cd data-scraper && go build -ldflags="-X github.com/kaniuse/kaniuse/data-scraper/pkg/cmds.ScrapMaxVersion=$(ScrapMaxVersion)" -o ./data-scraper ./cmd/data-scraper
 
 .PHONY: data
 data: data-api-lifecycle data-kinds data-fields ## Update data JSON files

@@ -1,11 +1,12 @@
 # syntax=docker/dockerfile:experimental
 
 FROM golang:1.19 AS build-env
+ARG ScrapMaxVersion=1.32
 ENV GO111MODULE on
 ENV CGO_ENABLED 0
 WORKDIR /
 COPY . /data-scraper
-RUN cd /data-scraper && go build -o /data-scraper/data-scraper ./cmd/data-scraper
+RUN cd /data-scraper && go build -ldflags="-X github.com/kaniuse/kaniuse/data-scraper/pkg/cmds.ScrapMaxVersion=${ScrapMaxVersion}" -o /data-scraper/data-scraper ./cmd/data-scraper
 
 FROM debian:stable-slim AS certs
 RUN apt-get update && apt-get -uy upgrade
