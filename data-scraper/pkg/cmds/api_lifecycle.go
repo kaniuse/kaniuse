@@ -14,8 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const ScrapMinVersion = "1.5"
-const ScrapMaxVersion = "1.32"
+var (
+	ScrapMinVersion = "1.5"
+	ScrapMaxVersion = "1.32"
+)
 
 type apiLifecycleCmdOptions struct {
 	Write      string
